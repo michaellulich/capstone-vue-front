@@ -1,11 +1,16 @@
 <template>
+  
+
+
+
   <div class="home">
+
     <h1>Chicago Shows</h1>
     <h1>All Events</h1>
     <div v-for="event in events">
       <ul>
         <li>{{event.time}} {{event.description}} @ {{event.name}} with: {{getArtistsFromEvent(event)}}</li>
-
+      
       </ul>
     </div>
      
