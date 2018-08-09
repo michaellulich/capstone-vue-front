@@ -1,18 +1,46 @@
 <template>
   <div class="home">
-    <img src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1>Chicago Shows</h1>
+    <h1>All Events</h1>
+    <div v-for="event in events">
+      <ul>
+        <li>{{event.time}} {{event.description}} @ {{event.name}} with: {{getArtistsFromEvent(event)}}</li>
+
+      </ul>
+    </div>
+     
+    
   </div>
 </template>
 
-<script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+<style>
+</style>
 
+<script>
+var axios = require("axios");
 export default {
-  name: 'home',
-  components: {
-    HelloWorld
-  }
-}
+  data: function() {
+    return {
+      events: []
+    };
+  },
+  created: function() {
+    axios.get("http://localhost:3000/events/").then(
+      function(response) {
+        this.events = response.data;
+      }.bind(this)
+    );
+    axios.get("http://localhost:3000/artist_events/").then(
+      function(response) {
+        this.artist_events = response.data;
+      }.bind(this)
+    );
+  },
+  methods: {
+    getArtistsFromEvent: function(inputEvent) {
+      return inputEvent.artists.map(artist => artist.name).join(", ");
+    }
+  },
+  computed: {}
+};
 </script>
