@@ -8,6 +8,8 @@ if (jwt) {
   axios.defaults.headers.common["Authorization"] = jwt;
 }
 
+Vue.use(require("moment"));
+
 Vue.config.productionTip = false;
 
 new Vue({

@@ -1,3 +1,5 @@
+
+
 <template>
   <div class="signup">
     <div class="container">
@@ -15,6 +17,10 @@
           <input type="email" class="form-control" v-model="email">
         </div>
         <div class="form-group">
+          <label>Genre:</label>
+          <input type="text" class="form-control" v-model="genre">
+        </div>
+        <div class="form-group">
           <label>Password:</label>
           <input type="password" class="form-control" v-model="password">
         </div>
@@ -29,13 +35,14 @@
 </template>
 
 <script>
-var axios = require("axios");
+import axios from "axios";
 
 export default {
   data: function() {
     return {
       name: "",
       email: "",
+      genre: "",
       password: "",
       passwordConfirmation: "",
       errors: []
@@ -50,7 +57,7 @@ export default {
         password_confirmation: this.passwordConfirmation
       };
       axios
-        .post("http://localhost:3000/users", params)
+        .post("http://localhost:3000/artists", params)
         .then(response => {
           this.$router.push("/login");
         })
