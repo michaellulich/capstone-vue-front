@@ -13,7 +13,6 @@
       </div>
     </div>
      
-    
   </div>
 </template>
 
@@ -24,10 +23,11 @@
 </style>
 
 <script>
-/*global google*/
+/*global google map*/
 var axios = require("axios");
 var moment = require("moment");
 var infoWindow;
+var chicago = { lat: 41.851215, lng: -87.634422 };
 
 export default {
   data: function() {
@@ -35,52 +35,17 @@ export default {
       events: []
     };
   },
+
   mounted: function() {
-    var chicago = { lat: 41.851215, lng: -87.634422 };
-    var map = new google.maps.Map(document.getElementById("map"), {
-      zoom: 15,
-      center: chicago
-    });
-    infoWindow = new google.maps.InfoWindow();
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          var pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-
-          infoWindow.setPosition(pos);
-          infoWindow.setContent("Location Found.");
-          infoWindow.open(map);
-          map.setCenter(pos);
-        },
-        function() {
-          handleLocationError(true, infoWindow, map.getCenter());
-        }
-      );
-    } else {
-      handleLocationError(false, infoWindow, map.getCenter());
-    }
-
-    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-      infoWindow.setPosition(pos);
-      infoWindow.setContent(
-        browserHasGeolocation
-          ? "Error: The Geolocation service failed."
-          : "Error: Your browser doesn't support geolocation."
-      );
-      infoWindow.open(map);
-    }
-    // var marker = new google.maps.Marker({ position: chicago, map: map });
-  },
-
-  created: function() {
     axios.get("http://localhost:3000/events/").then(
       function(response) {
         this.events = response.data;
+        this.setupMap();
       }.bind(this)
     );
+  },
+
+  created: function() {
     axios.get("http://localhost:3000/artist_events/").then(
       function(response) {
         this.artist_events = response.data;
@@ -93,6 +58,68 @@ export default {
     },
     timeConvert: function(inputTime) {
       return moment().format("MMM do YY");
+    },
+    setupMap: function() {
+      var map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: chicago
+      });
+      var geocoder = new google.maps.Geocoder();
+      this.events.forEach(event => {
+        console.log({ event });
+        geocoder.geocode({ address: event.address }, (results, status) => {
+          if (status === "OK") {
+            map.setCenter(results[0].geometry.location);
+            var infowindow = new google.maps.InfoWindow({
+              content: this.getArtistsFromEvent(event)
+            });
+            var marker = new google.maps.Marker({
+              map: map,
+              position: results[0].geometry.location,
+              title: event.description
+            });
+            marker.addListener("click", () => {
+              infowindow.open(map, marker);
+            });
+          } else {
+            alert(
+              "Geocode was not successful for the following reason: " + status
+            );
+          }
+        });
+      });
+
+      infoWindow = new google.maps.InfoWindow();
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            infoWindow.setPosition(pos);
+            infoWindow.setContent("Current Location!");
+            infoWindow.open(map);
+            map.setCenter(pos);
+          },
+          function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          }
+        );
+      } else {
+        handleLocationError(false, infoWindow, map.getCenter());
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(
+          browserHasGeolocation
+            ? "Error: The Geolocation service failed."
+            : "Error: Your browser doesn't support geolocation."
+        );
+        infoWindow.open(map);
+      }
     }
   },
   computed: {}

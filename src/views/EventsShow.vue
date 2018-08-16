@@ -3,6 +3,7 @@
     <div class="container">
       <h2>{{ event.name }}</h2>
       <p>{{ event.description }}</p>
+      <p>{{getArtistsFromEvent(event)}}</p>
       <p>{{timeConvert(event.time)}}</p>
       <a href="/#/">Back to all events</a>
     </div>
@@ -31,6 +32,9 @@ export default {
   methods: {
     timeConvert: function(inputTime) {
       return moment().format("MMM do YY");
+    },
+    getArtistsFromEvent: function(inputEvent) {
+      return inputEvent.artists.map(artist => artist.name).join(", ");
     }
   }
 };
