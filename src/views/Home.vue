@@ -27,7 +27,6 @@
 var axios = require("axios");
 var moment = require("moment");
 var infoWindow;
-var chicago = { lat: 41.851215, lng: -87.634422 };
 
 export default {
   data: function() {
@@ -61,12 +60,13 @@ export default {
     },
     setupMap: function() {
       var map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 15,
-        center: chicago
+        zoom: 15
+        // center: chicago
       });
+
+      /* MARKER SET UP */
       var geocoder = new google.maps.Geocoder();
       this.events.forEach(event => {
-        console.log({ event });
         geocoder.geocode({ address: event.address }, (results, status) => {
           if (status === "OK") {
             map.setCenter(results[0].geometry.location);
@@ -89,24 +89,23 @@ export default {
         });
       });
 
+      /* Location Finder */
       infoWindow = new google.maps.InfoWindow();
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          function(position) {
-            var pos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
 
-            infoWindow.setPosition(pos);
-            infoWindow.setContent("Current Location!");
-            infoWindow.open(map);
-            map.setCenter(pos);
-          },
+          infoWindow.setPosition(pos);
+          infoWindow.setContent("Current Location!");
+          infoWindow.open(map);
+          map.setCenter(pos);
+        }),
           function() {
             handleLocationError(true, infoWindow, map.getCenter());
-          }
-        );
+          };
       } else {
         handleLocationError(false, infoWindow, map.getCenter());
       }

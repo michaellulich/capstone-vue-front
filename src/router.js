@@ -9,6 +9,8 @@ import EventsShow from "./views/EventsShow.vue";
 import LoginArtist from "./views/LoginArtist.vue";
 import SignupArtist from "./views/SignupArtist.vue";
 import EventCreate from "./views/EventCreate.vue";
+// import MaterializeTest from "./views/MaterializeTest.vue";
+import UserShow from "./views/UserShow.vue";
 
 Vue.use(Router);
 
@@ -35,6 +37,11 @@ export default new Router({
     { path: "/events/:id", name: "events-show", component: EventsShow },
     { path: "/loginartist", name: "loginartist", component: LoginArtist },
     { path: "/signupartist", name: "signupartist", component: SignupArtist },
-    { path: "/eventcreate", name: "eventcreate", component: EventCreate }
+    { path: "/eventcreate", name: "eventcreate", component: EventCreate },
+    { path: "/usershow/:id", name: "user-show", component: UserShow }
+    // {
+    //   path: "/materializetest",
+    //   name: "materializetest",
+    //   component: MaterializeTest
   ]
 });

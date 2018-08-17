@@ -29,6 +29,7 @@ export default {
     return {
       email: "",
       password: "",
+      user: "",
       errors: []
     };
   },
@@ -36,15 +37,17 @@ export default {
     submit: function() {
       var params = {
         email: this.email,
-        password: this.password
+        password: this.password,
+        user_id: this.user_id
       };
       axios
         .post("http://localhost:3000/sessions", params)
         .then(response => {
+          console.log(response);
           axios.defaults.headers.common["Authorization"] =
             "Bearer " + response.data.jwt;
           localStorage.setItem("jwt", response.data.jwt);
-          this.$router.push("/");
+          this.$router.push("/usershow/");
         })
         .catch(error => {
           this.errors = ["Invalid email or password."];
