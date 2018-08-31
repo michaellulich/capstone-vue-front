@@ -43,7 +43,6 @@ export default {
       axios
         .post("http://localhost:3000/sessions", params)
         .then(response => {
-          console.log(response);
           axios.defaults.headers.common["Authorization"] =
             "Bearer " + response.data.jwt;
           localStorage.setItem("jwt", response.data.jwt);

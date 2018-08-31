@@ -11,11 +11,11 @@
           <input type="text" class="form-control" v-model="address">
         </div>
         <div class="form-group">
-          <label>Name:</label>
+          <label>Venue Name:</label>
           <input type="text" class="form-control" v-model="name">
         </div>
         <div class="form-group">
-          <label>Description:</label>
+          <label>Event Description:</label>
           <input type="text" class="form-control" v-model="description">
         </div>
         <div class="form-group">

@@ -59,7 +59,19 @@ export default {
       axios
         .post("http://localhost:3000/artists", params)
         .then(response => {
-          this.$router.push("/login");
+          axios
+            .post("http://localhost:3000/artist_sessions", params)
+            .then(response => {
+              axios.defaults.headers.common["Authorization"] =
+                "Bearer " + response.data.jwt;
+              localStorage.setItem("jwt", response.data.jwt);
+              this.$router.push("/eventcreate");
+            })
+            .catch(error => {
+              this.errors = ["Invalid email or password."];
+              this.email = "";
+              this.password = "";
+            });
         })
         .catch(error => {
           this.errors = error.response.data.errors;

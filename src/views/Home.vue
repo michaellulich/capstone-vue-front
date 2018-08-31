@@ -2,10 +2,9 @@
   <div class="home">
     <h1>LoCALE</h1>
     <div id='map'></div>
-    <h1>All Events</h1>
+    <h1>ALL the Events</h1>
     <a href="https://accounts.spotify.com/authorize?client_id=d45c03352faf4be4884e657dc00ce33f&response_type=code&redirect_uri=http://localhost:8080/">spotify</a>
-    <button v-on:click="draw()">draw route</button>
-    <button ><a v-bind:href="'/#/profile'" >Current User Profile</a></button>
+    <button ><a v-bind:href="'/#/profile'" >User Profile</a></button>
     <div class="row">
       <div class="col s4" v-for="event in events">
         <div class="card">
@@ -15,7 +14,7 @@
             <div class="card-content">
               <span class="card-title activator grey-text text-darken-4">{{getArtistsFromEvent(event)}}<i class="material-icons right">more_vert</i></span>
             </div>
-              <div v-on:click='setDestination()' class="card-reveal">
+              <div class="card-reveal">
                 <span class="card-title grey-text text-darken-4">{{getArtistsFromEvent(event)}}<i class="material-icons right">close</i>
                 </span>
                   <ul>
@@ -30,10 +29,10 @@
 
                     <div v-on:click="favoriteButton(event)"> 
                       <button ><a v-bind:href="'/#/events/' + event.id">Event Info</a></button>
-                      <button v-if="!event.favorited" v-bind:class="{favorited: event.favorited}" v-on:click='addToFavorites(event)'>Add to My Events</button>
-                      <button v-if="event.favorited" v-bind:class="{favorited: event.favorited}"v-on:click='removeFromFavorites(event)'>Remove From My Events</button>
+                      <button v-if="!event.favorited" v-bind:class="{favorited: event.favorited}" v-on:click='addToFavorites(event)'>Heck YES!</button>
+                      <button v-if="event.favorited" v-bind:class="{favorited: event.favorited}"v-on:click='removeFromFavorites(event)'>Oh heck, no thanks.</button>
                     </div>
-                    <div v-on:click='draw()'>
+                    <div v-on:click='showRoute(event)'>
                      <button >Show Route</button>
                     </div>
               </div>
@@ -129,6 +128,7 @@ export default {
     // );
   },
   created: function() {
+    window.app = this;
     var url = location.href;
     if (url.split("?code=").length > 1) {
       var code = url.split("?code=")[1].split("#")[0];
@@ -139,6 +139,7 @@ export default {
             "spotifyAccessToken",
             response.data.access_token
           );
+          history.replaceState("data to be passed", "Title of the page", "/#/");
           // this.$router.push("/");
           // { headers: { "Authorization": `Bearer ${accessToken}`} };
 
@@ -195,11 +196,15 @@ export default {
           function(response) {
             this.currentArtistTrackSpotifyID =
               response.data["artists"]["items"][0]["id"];
+            console.log(response.data["artists"]);
           }.bind(this)
         );
     },
     draw: function() {
       this.drawDirections();
+    },
+    time: function() {
+      console.log(moment(event.time).format("MMM do YY"));
     },
     getUserId: function() {
       axios.get("http://localhost:3000/usersprofile/").then(
@@ -207,6 +212,10 @@ export default {
           this.userProfile = response.data;
         }.bind(this)
       );
+    },
+    showRoute: function(event, marker) {
+      this.destination = event.address;
+      this.drawDirections();
     },
     // SET UP MAP FUNCTION LAST
     setupMap: function() {
@@ -238,15 +247,20 @@ export default {
         geocoder.geocode({ address: event.address }, (results, status) => {
           if (status === "OK") {
             map.setCenter(results[0].geometry.location);
-            var contentString =
-              "<div id=infoWindow>" +
-              "<ul>" +
-              `${event.artists[0]}` +
-              `${event.name}` +
-              `${event.address}` +
-              "<button>Get Route</button>" +
-              "</ul>" +
-              "</div>";
+            // console.log("event artists", event.artists[0]);
+            var artistsContentString = event.artists
+              .map(artist => `<h4>${artist.name}</h4>`)
+              .join("");
+            var timeString = moment(event.time).format("MMM do YY");
+            var contentString = `
+                <div id="infowindow">
+                  ${artistsContentString}
+                  <h5>@${event.name}</h5>
+                  <p>${event.address}</p>
+                  <h4>${timeString}<h4>
+                  <button onclick="app.drawDirections()">Show route</button>
+                </div>
+                `;
             var infowindow = new google.maps.InfoWindow({
               content: contentString
             });
@@ -288,7 +302,7 @@ export default {
               lng: position.coords.longitude
             };
             infoWindow.setPosition(this.pos);
-            infoWindow.setContent("location");
+            infoWindow.setContent("You Are Here.");
             infoWindow.open(map);
             map.setCenter(this.pos);
           }.bind(this),
