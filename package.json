@@ -10,6 +10,7 @@
     "axios": "^0.18.0",
     "moment": "^2.22.2",
     "vue": "^2.5.16",
+    "vue-audio-visual": "^1.2.0",
     "vue-router": "^3.0.1",
     "vue2-google-maps": "^0.10.2"
   },

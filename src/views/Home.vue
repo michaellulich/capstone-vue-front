@@ -29,8 +29,8 @@
 
                     <div v-on:click="favoriteButton(event)"> 
                       <button ><a v-bind:href="'/#/events/' + event.id">Event Info</a></button>
-                      <button v-if="!event.favorited" v-bind:class="{favorited: event.favorited}" v-on:click='addToFavorites(event)'>Heck YES!</button>
-                      <button v-if="event.favorited" v-bind:class="{favorited: event.favorited}"v-on:click='removeFromFavorites(event)'>Oh heck, no thanks.</button>
+                      <button v-if="!event.favorited" v-bind:class="{favorited: event.favorited}" v-on:click='addToFavorites(event)'>I'd like to go.</button>
+                      <button v-if="event.favorited" v-bind:class="{favorited: event.favorited}"v-on:click='removeFromFavorites(event)'>No thanks!</button>
                     </div>
                     <div v-on:click='showRoute(event)'>
                      <button >Show Route</button>
@@ -45,8 +45,27 @@
       <div class="modal-content">
         <h4>{{currentArtist}}</h4>
         <p><iframe v-bind:src="`https://open.spotify.com/embed/artist/${currentArtistTrackSpotifyID}`" width="380" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></p>
+         <!-- <av-bars
+              caps-color="#FFF"
+              :bar-color="['#f00', '#ff0', '#0f0']"
+              canv-fill-color="#000"
+              :caps-height="2"
+              audio-src="/Haydn_Cello_Concerto_D-1.mp3"
+            ></av-bars> -->
+        <div class="modal-content">
+            <div class="audio-viz">
+                <form class="audio-viz__form">
+                    <input type="radio" class="audio-viz__radio"  id="senventies" name="radio-selection"     value="/Haydn_Cello_Concerto_D-1.mp3"    checked>
+                      <button><label for="senventies"><span></span>Haydn Cello Concerto in D</label></button>
+                      
 
-        <p>{{`https://open.spotify.com/embed/artist/${currentArtistTrackSpotifyID}`}}</p>
+                      <input type="radio" class="audio-viz__radio" id="eighties" name="radio-selection" value="http://ice1.somafm.com/u80s-128-aac">
+                      <button><label for="eighties"><span></span>80's Radio</label></button>
+                </form>
+                  <canvas id="oscilloscope"></canvas>
+                    <button class="audio-viz__btn" id="start">Start Audio </button>
+            </div>              
+          </div>
       </div>
       <div class="modal-footer">
         <a href="#" class="modal-close waves-effect waves-green btn-flat">Close</a>
@@ -59,6 +78,10 @@
 #map {
   height: 500px;
 }
+
+h1 {
+  font-family: "Baloo Tammudu";
+}
 .favorited {
   color: green;
 }
@@ -67,13 +90,17 @@
   top: 10px;
   left: 25%;
   z-index: 5;
-  background-color: #fff;
+  background-image: (memphis-colorful.png);
+  background-color: #4286f4;
   padding: 5px;
   border: 1px solid #999;
   text-align: center;
   font-family: "Roboto", "sans-serif";
   line-height: 30px;
   padding-left: 10px;
+}
+.nav {
+  background-color: #4286f4;
 }
 </style>
 
@@ -106,7 +133,8 @@ export default {
     $(document).ready(function() {
       $(".modal").modal();
     });
-
+    //wave form radio //
+    this.setUpVisualizer();
     axios.get("http://localhost:3000/events/").then(
       function(response) {
         this.events = response.data;
@@ -217,10 +245,246 @@ export default {
       this.destination = event.address;
       this.drawDirections();
     },
+    setUpVisualizer: function() {
+      // @ref
+      // https://www.w3.org/TR/webaudio
+      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement
+      // https://noisehack.com/build-music-visualizer-web-audio-api
+      // ========================================================
+      // Global Config
+      // ========================================================
+      var start_button = document.getElementById("start"),
+        radios = document.querySelectorAll('input[name="radio-selection"]'),
+        radios_length = radios.length,
+        audioContext = void 0,
+        masterGain = void 0;
+      // ========================================================
+      // Audio Setup
+      // ========================================================
+      function audioSetup() {
+        var source = void 0;
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioContext.createGain();
+        masterGain.connect(audioContext.destination);
+        for (var i = 0, max = radios_length; i < max; i++) {
+          if (radios[i].checked === true) {
+            source = radios[i].value;
+          }
+        }
+        var song = new Audio(source),
+          songSource = audioContext.createMediaElementSource(song),
+          songPlaying = false;
+        song.crossOrigin = "anonymous";
+        songSource.connect(masterGain);
+        for (var i = 0, max = radios_length; i < max; i++) {
+          radios[i].addEventListener("change", function() {
+            if (songPlaying) {
+              song.pause();
+              start_button.innerHTML = "Start Audio";
+              songPlaying = !songPlaying;
+            }
+            // Without these lines the oscilloscope won't update
+            // when a new selection is made via radio inputs
+            song = new Audio(this.value);
+            (songSource = audioContext.createMediaElementSource(song)),
+              (song.crossOrigin = "anonymous");
+            songSource.connect(masterGain);
+          });
+        }
+        start_button.addEventListener("click", function() {
+          if (songPlaying) {
+            console.log("PAUSE");
+            song.pause();
+            start_button.innerHTML = "Start Audio";
+          } else {
+            console.log("PLAY", song, waveform);
+            song.play();
+            drawOscilloscope();
+            updateWaveForm();
+            start_button.innerHTML = "Stop Audio";
+          }
+          songPlaying = !songPlaying;
+        });
+      }
+      audioSetup();
+      // ========================================================
+      // Create Wave Form
+      // ========================================================
+      var analyser = audioContext.createAnalyser();
+      masterGain.connect(analyser);
+      var waveform = new Float32Array(analyser.frequencyBinCount);
+      analyser.getFloatTimeDomainData(waveform);
+      function updateWaveForm() {
+        requestAnimationFrame(updateWaveForm);
+        analyser.getFloatTimeDomainData(waveform);
+      }
+      // ========================================================
+      // Draw Oscilloscope
+      // ========================================================
+      function drawOscilloscope() {
+        requestAnimationFrame(drawOscilloscope);
+        var scopeCanvas = document.getElementById("oscilloscope");
+        var scopeContext = scopeCanvas.getContext("2d");
+        scopeCanvas.width = waveform.length;
+        scopeCanvas.height = 200;
+        scopeContext.clearRect(0, 0, scopeCanvas.width, scopeCanvas.height);
+        scopeContext.beginPath();
+        for (var i = 0; i < waveform.length; i++) {
+          var x = i;
+          var y = (0.5 + waveform[i] / 2) * scopeCanvas.height;
+          if (i == 0) {
+            scopeContext.moveTo(x, y);
+          } else {
+            scopeContext.lineTo(x, y);
+          }
+        }
+        scopeContext.strokeStyle = "#5661FA";
+        scopeContext.lineWidth = 2;
+        scopeContext.stroke();
+      }
+    },
     // SET UP MAP FUNCTION LAST
     setupMap: function() {
       var map = new google.maps.Map(document.getElementById("map"), {
         zoom: 13,
+        styles: [
+          {
+            elementType: "geometry",
+            stylers: [
+              {
+                hue: "#ff4400"
+              },
+              {
+                saturation: -68
+              },
+              {
+                lightness: -4
+              },
+              {
+                gamma: 0.72
+              }
+            ]
+          },
+          {
+            featureType: "road",
+            elementType: "labels.icon"
+          },
+          {
+            featureType: "landscape.man_made",
+            elementType: "geometry",
+            stylers: [
+              {
+                hue: "#0077ff"
+              },
+              {
+                gamma: 3.1
+              }
+            ]
+          },
+          {
+            featureType: "water",
+            stylers: [
+              {
+                hue: "#00ccff"
+              },
+              {
+                gamma: 0.44
+              },
+              {
+                saturation: -33
+              }
+            ]
+          },
+          {
+            featureType: "poi.park",
+            stylers: [
+              {
+                hue: "#44ff00"
+              },
+              {
+                saturation: -23
+              }
+            ]
+          },
+          {
+            featureType: "water",
+            elementType: "labels.text.fill",
+            stylers: [
+              {
+                hue: "#007fff"
+              },
+              {
+                gamma: 0.77
+              },
+              {
+                saturation: 65
+              },
+              {
+                lightness: 99
+              }
+            ]
+          },
+          {
+            featureType: "water",
+            elementType: "labels.text.stroke",
+            stylers: [
+              {
+                gamma: 0.11
+              },
+              {
+                weight: 5.6
+              },
+              {
+                saturation: 99
+              },
+              {
+                hue: "#0091ff"
+              },
+              {
+                lightness: -86
+              }
+            ]
+          },
+          {
+            featureType: "transit.line",
+            elementType: "geometry",
+            stylers: [
+              {
+                lightness: -48
+              },
+              {
+                hue: "#ff5e00"
+              },
+              {
+                gamma: 1.2
+              },
+              {
+                saturation: -23
+              }
+            ]
+          },
+          {
+            featureType: "transit",
+            elementType: "labels.text.stroke",
+            stylers: [
+              {
+                saturation: -64
+              },
+              {
+                hue: "#ff9100"
+              },
+              {
+                lightness: 16
+              },
+              {
+                gamma: 0.47
+              },
+              {
+                weight: 2.7
+              }
+            ]
+          }
+        ],
         // center: chicago
         mapTypeControlOptions: {
           mapTypeIds: [
@@ -244,15 +508,17 @@ export default {
       /* MARKER SET UP */
       var geocoder = new google.maps.Geocoder();
       this.events.forEach(event => {
-        geocoder.geocode({ address: event.address }, (results, status) => {
-          if (status === "OK") {
-            map.setCenter(results[0].geometry.location);
-            // console.log("event artists", event.artists[0]);
-            var artistsContentString = event.artists
-              .map(artist => `<h4>${artist.name}</h4>`)
-              .join("");
-            var timeString = moment(event.time).format("MMM do YY");
-            var contentString = `
+        geocoder.geocode(
+          { address: event.address },
+          (results, status) => {
+            if (status === "OK") {
+              map.setCenter(results[0].geometry.location);
+              // console.log("event artists", event.artists[0]);
+              var artistsContentString = event.artists
+                .map(artist => `<h4>${artist.name}</h4>`)
+                .join("");
+              var timeString = moment(event.time).format("MMM do YY");
+              var contentString = `
                 <div id="infowindow">
                   ${artistsContentString}
                   <h5>@${event.name}</h5>
@@ -261,35 +527,37 @@ export default {
                   <button onclick="app.drawDirections()">Show route</button>
                 </div>
                 `;
-            var infowindow = new google.maps.InfoWindow({
-              content: contentString
-            });
-            var marker = new google.maps.Marker({
-              map: map,
-              position: results[0].geometry.location,
-              title: event.description,
-              animation: google.maps.Animation.DROP
-            });
+              var infowindow = new google.maps.InfoWindow({
+                content: contentString
+              });
+              var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location,
+                title: event.description,
+                animation: google.maps.Animation.DROP
+              });
 
-            marker.addListener("click", () => {
-              infowindow.open(map, marker);
-              toggleBounce();
-              setTimeout(toggleBounce, 2000);
-              this.setDestination(event, marker);
-            });
-          } else {
-            alert(
-              "Geocode was not successful for the following reason: " + status
-            );
-          }
-          function toggleBounce() {
-            if (marker.getAnimation() !== null) {
-              marker.setAnimation(null);
+              marker.addListener("click", () => {
+                infowindow.open(map, marker);
+                toggleBounce();
+                setTimeout(toggleBounce, 2000);
+                this.setDestination(event, marker);
+              });
             } else {
-              marker.setAnimation(google.maps.Animation.BOUNCE);
+              alert(
+                "Geocode was not successful for the following reason: " + status
+              );
             }
-          }
-        });
+            function toggleBounce() {
+              if (marker.getAnimation() !== null) {
+                marker.setAnimation(null);
+              } else {
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+              }
+            }
+          },
+          250
+        );
       });
 
       /* geolocation */

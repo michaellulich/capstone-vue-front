@@ -1,10 +1,13 @@
 <template>
   <div class="events-show">
     <div class="container">
-      <h2>{{ event.name }}</h2>
-      <p>{{ event.description }}</p>
-      <p>{{getArtistsFromEvent(event)}}</p>
-      <p>{{timeConvert(event.time)}}</p>
+      <h1>{{getArtistsFromEvent(event)}}</h1>
+      <h3>{{timeConvert(event.time)}}</h3>
+      <h2>{{ event.description }} @ {{ event.name }}</h2>
+      <h3>{{event.address}}</h3>
+      
+      
+      
       <a href="/#/">Back to all events</a>
     </div>
   </div>

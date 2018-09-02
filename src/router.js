@@ -11,6 +11,8 @@ import EventCreate from "./views/EventCreate.vue";
 import Profile from "./views/Profile.vue";
 import User_Event from "./views/User_Event.vue";
 import ArtistShow from "./views/ArtistShow.vue";
+import Visualizer from "./views/Visualizer.vue";
+import SpotifyVisualizer from "./views/SpotifyVisualizer.vue";
 
 Vue.use(Router);
 
@@ -39,6 +41,12 @@ export default new Router({
     { path: "/eventcreate", name: "eventcreate", component: EventCreate },
     { path: "/profile", name: "profile", component: Profile },
     { path: "/user_event", name: "user_event", component: User_Event },
-    { path: "/artistshow/:id", name: "artistshow", component: ArtistShow }
+    { path: "/artistshow/:id", name: "artistshow", component: ArtistShow },
+    { path: "/visualizer/", name: "visualizer", component: Visualizer },
+    {
+      path: "/SpotifyVisualizer/",
+      name: "spotifyvisualizer",
+      component: SpotifyVisualizer
+    }
   ]
 });

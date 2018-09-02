@@ -16,6 +16,7 @@
         </div>
         <input type="submit" class="btn btn-primary" value="Submit">
       </form>
+      <a href="/#/"><input type="submit" class='btn btn primary' value='Back To Events'></a>
     </div>
   </div>
 </template>

@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+      
 <!-- Dropdown Structure -->
 <nav>
   <div class="nav-wrapper">
@@ -17,31 +18,34 @@
     </div>
   </div>
 </nav>
-<div>
+
+<!-- <div>
   <ul class="sidenav" id="mobile-demo">
     <li><a href="">Home</a>
       </li>
-        <!-- Dropdown Trigger -->
-        <li><a class="dropdown-trigger" href="" data-target="dropdown1">SignUp<i class="material-icons right">arrow_drop_down</i></a>
+        Dropdown Trigger -->
+        <!-- <li><a class="dropdown-trigger" href="" data-target="dropdown1">SignUp<i class="material-icons right">arrow_drop_down</i></a>
       </li>
-      <!-- Dropdown Trigger -->
-        <li><a class="dropdown-trigger" href="" data-target="dropdown2">LogIn<i class="material-icons right">arrow_drop_down</i></a>
+      < Dropdown Trigger -->
+        <!-- <li><a class="dropdown-trigger" href="" data-target="dropdown2">LogIn<i class="material-icons right">arrow_drop_down</i></a>
         </li>
       <li><a href="/#/logout">LogOut</a>
       </li>  
   </ul>
-</div>
+</div> --> 
   
 
 <!-- drop down links -->
-  <ul id="dropdown1" class="dropdown-content">
+<ul id="dropdown1" class="dropdown-content">
     <li><a href="/#/signupartist">ARTIST</a></li>
     <li><a href="/#/signup">USER</a></li>
-  </ul>
-    <ul id="dropdown2" class="dropdown-content">
+</ul>
+<ul id="dropdown2" class="dropdown-content">
       <li><a href="/#/loginartist">ARTIST</a></li>
       <li><a href="/#/login">USER</a></li>
-    </ul>
+</ul>
+
+
 
 <!-- parallax picture -->
 <div class="parallax-container">
@@ -50,7 +54,7 @@
 
 <div class="container">
     <router-view/>
-</div>  
+</div>
 
 <div class="parallax-container">
       <div class="parallax"><img src="https://imgur.com/cwvA4Uj.jpg"></div>
@@ -94,6 +98,18 @@ main {
 }
 .parallax-container {
   height: 275px;
+}
+
+.page-footer {
+  background-color: #4286f4;
+}
+
+h1 {
+  font-family: "Baloo Tammudu";
+}
+
+.brand-logo.right {
+  font-family: "Baloo Tammudu";
 }
 </style>
 
