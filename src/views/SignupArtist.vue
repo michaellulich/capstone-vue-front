@@ -4,7 +4,7 @@
   <div class="signup">
     <div class="container">
       <form v-on:submit.prevent="submit()">
-        <h1>Signup</h1>
+        <h1>Artist Signup</h1>
         <ul>
           <li class="text-danger" v-for="error in errors">{{ error }}</li>
         </ul>
@@ -29,7 +29,9 @@
           <input type="password" class="form-control" v-model="passwordConfirmation">
         </div>
         <input type="submit" class="btn btn-primary" value="Submit">
+
       </form>
+      <a href="/#/"><input type="submit" class='btn btn primary' value='Back To Events'></a>
     </div>
   </div>
 </template>

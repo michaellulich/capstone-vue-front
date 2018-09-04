@@ -1,43 +1,45 @@
 <template>
   <div class="home">
-    <h1>LoCALE</h1>
     <div id='map'></div>
-    <h1>ALL the Events</h1>
-    <a href="https://accounts.spotify.com/authorize?client_id=d45c03352faf4be4884e657dc00ce33f&response_type=code&redirect_uri=http://localhost:8080/">spotify</a>
-    <button ><a v-bind:href="'/#/profile'" >User Profile</a></button>
-    <div class="row">
-      <div class="col s4" v-for="event in events">
-        <div class="card">
-          <div class="card-image waves-effect waves-block waves-light">
-            <img class="activator" src="https://images-na.ssl-images-amazon.com/images/I/716EFOeWz8L._SL1350_.jpg">
-          </div>
-            <div class="card-content">
-              <span class="card-title activator grey-text text-darken-4">{{getArtistsFromEvent(event)}}<i class="material-icons right">more_vert</i></span>
+    <div class="container cards">
+      
+      <h1>ALL the Events</h1>
+      <button><a href="https://accounts.spotify.com/authorize?client_id=d45c03352faf4be4884e657dc00ce33f&response_type=code&redirect_uri=http://localhost:8080/">spotify</a></button>
+      <button ><a v-bind:href="'/#/profile'" >User Profile</a></button>
+      <div class="row">
+        <div class="col s4" v-bind:class="{'super-selected': event === currentEvent}" v-for="event in events">
+          <div class="card" v-bind:id="`card-${event.id}`">
+            <div class="card-image waves-effect waves-block waves-light" >
+              <img class="activator"  v-bind:src="`${event.artists[0].primary_image}`" height=220>
             </div>
-              <div class="card-reveal">
-                <span class="card-title grey-text text-darken-4">{{getArtistsFromEvent(event)}}<i class="material-icons right">close</i>
-                </span>
-                  <ul>
-                    <li>{{timeConvert(event.time)}}</li> 
-                    <li>{{event.description}}</li> 
-                    <li>@ {{event.name}} {{event.address}}</li> 
-                  </ul>
-                    
-                    <div v-for="artist in event.artists">
-                      <button data-target="modal" class="btn modal-trigger"  v-on:click="spotifyArtistSearch(artist.name)">{{ artist.name }}</button>
-                    </div>
-
-                    <div v-on:click="favoriteButton(event)"> 
-                      <button ><a v-bind:href="'/#/events/' + event.id">Event Info</a></button>
-                      <button v-if="!event.favorited" v-bind:class="{favorited: event.favorited}" v-on:click='addToFavorites(event)'>I'd like to go.</button>
-                      <button v-if="event.favorited" v-bind:class="{favorited: event.favorited}"v-on:click='removeFromFavorites(event)'>No thanks!</button>
-                    </div>
-                    <div v-on:click='showRoute(event)'>
-                     <button >Show Route</button>
-                    </div>
+              <div class="card-content">
+                <span class="card-title activator grey-text text-darken-4">{{getArtistsFromEvent(event)}}<i class="material-icons right">more_vert</i></span>
               </div>
-        </div>
-      </div>        
+                <div class="card-reveal">
+                  <span class="card-title grey-text text-darken-4">{{getArtistsFromEvent(event)}}<i class="material-icons right">close</i>
+                  </span>
+                    <ul>
+                      <li>{{event.formatted_time}}</li> 
+                      <li>{{event.description}}</li> 
+                      <li>@ {{event.name}} {{event.address}}</li> 
+                    </ul>
+                      
+                      <div v-for="artist in event.artists">
+                        <button data-target="modal" class="btn modal-trigger"  v-on:click="spotifyArtistSearch(artist.name)">{{ artist.name }}</button>
+                      </div>
+
+                      <div v-on:click="favoriteButton(event)"> 
+                        <button ><a v-bind:href="'/#/events/' + event.id">Event Info</a></button>
+                        <button v-if="!event.favorited" v-bind:class="{favorited: event.favorited}" v-on:click='addToFavorites(event)'>I'd like to go.</button>
+                        <button v-if="event.favorited" v-bind:class="{favorited: event.favorited}"v-on:click='removeFromFavorites(event)'>No thanks!</button>
+                      </div>
+                      <div v-on:click='showRoute(event)'>
+                       <button >Show Route</button>
+                      </div>
+                </div>
+          </div>
+        </div>        
+      </div>
     </div>
 
 
@@ -57,10 +59,8 @@
                 <form class="audio-viz__form">
                     <input type="radio" class="audio-viz__radio"  id="senventies" name="radio-selection"     value="/Haydn_Cello_Concerto_D-1.mp3"    checked>
                       <button><label for="senventies"><span></span>Haydn Cello Concerto in D</label></button>
-                      
-
-                      <input type="radio" class="audio-viz__radio" id="eighties" name="radio-selection" value="http://ice1.somafm.com/u80s-128-aac">
-                      <button><label for="eighties"><span></span>80's Radio</label></button>
+                      <!-- <input type="radio" class="audio-viz__radio" id="eighties" name="radio-selection" value="http://ice1.somafm.com/u80s-128-aac">
+                      <button><label for="eighties"><span></span>80's Radio</label></button> -->
                 </form>
                   <canvas id="oscilloscope"></canvas>
                     <button class="audio-viz__btn" id="start">Start Audio </button>
@@ -76,7 +76,13 @@
 
 <style>
 #map {
-  height: 500px;
+  height: 40vh;
+  position: fixed;
+}
+
+.cards {
+  overflow: scroll;
+  height: 60vh;
 }
 
 h1 {
@@ -90,7 +96,6 @@ h1 {
   top: 10px;
   left: 25%;
   z-index: 5;
-  background-image: (memphis-colorful.png);
   background-color: #4286f4;
   padding: 5px;
   border: 1px solid #999;
@@ -99,13 +104,15 @@ h1 {
   line-height: 30px;
   padding-left: 10px;
 }
-.nav {
-  background-color: #4286f4;
+
+.super-selected {
+  color: #222a12 !important;
+  border: 2px #222a12 solid;
 }
 </style>
 
 <script>
-/*global google map*/
+/* global google, $ */
 var axios = require("axios");
 var moment = require("moment");
 var infoWindow;
@@ -124,7 +131,8 @@ export default {
       destination: "",
       currentArtist: "",
       currentArtistTrackSpotifyID: "",
-      userProfile: []
+      userProfile: [],
+      currentEvent: {}
     };
   },
 
@@ -138,7 +146,8 @@ export default {
     axios.get("http://localhost:3000/events/").then(
       function(response) {
         this.events = response.data;
-        // console.log("events", this.events);
+        // console.log("events", this.events[0].artists[0].primary_image);
+        console.log(this.events);
         this.setupMap();
         // this.drawDirections();
       }.bind(this)
@@ -189,7 +198,7 @@ export default {
       return inputEvent.artists.map(artist => artist.name).join(", ");
     },
     timeConvert: function(inputTime) {
-      return moment().format("MMM do YY");
+      return moment(inputTime).format("MMM do YY");
     },
     addToFavorites: function(inputEvent) {
       axios
@@ -198,7 +207,8 @@ export default {
           inputEvent.user_event = response.data;
         })
         .catch(error => {
-          this.errors = error.response.data.errors;
+          // this.errors = error.response.data.errors;
+          this.$router.push("/login/");
         });
     },
     removeFromFavorites: function(inputEvent) {
@@ -246,21 +256,11 @@ export default {
       this.drawDirections();
     },
     setUpVisualizer: function() {
-      // @ref
-      // https://www.w3.org/TR/webaudio
-      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement
-      // https://noisehack.com/build-music-visualizer-web-audio-api
-      // ========================================================
-      // Global Config
-      // ========================================================
       var start_button = document.getElementById("start"),
         radios = document.querySelectorAll('input[name="radio-selection"]'),
         radios_length = radios.length,
         audioContext = void 0,
         masterGain = void 0;
-      // ========================================================
-      // Audio Setup
-      // ========================================================
       function audioSetup() {
         var source = void 0;
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -283,8 +283,6 @@ export default {
               start_button.innerHTML = "Start Audio";
               songPlaying = !songPlaying;
             }
-            // Without these lines the oscilloscope won't update
-            // when a new selection is made via radio inputs
             song = new Audio(this.value);
             (songSource = audioContext.createMediaElementSource(song)),
               (song.crossOrigin = "anonymous");
@@ -346,7 +344,7 @@ export default {
     // SET UP MAP FUNCTION LAST
     setupMap: function() {
       var map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 13,
+        zoom: 10,
         styles: [
           {
             elementType: "geometry",
@@ -515,18 +513,19 @@ export default {
               map.setCenter(results[0].geometry.location);
               // console.log("event artists", event.artists[0]);
               var artistsContentString = event.artists
-                .map(artist => `<h4>${artist.name}</h4>`)
+                .map(artist => `<h6>${artist.name}</h6>`)
                 .join("");
               var timeString = moment(event.time).format("MMM do YY");
               var contentString = `
                 <div id="infowindow">
                   ${artistsContentString}
-                  <h5>@${event.name}</h5>
-                  <p>${event.address}</p>
-                  <h4>${timeString}<h4>
-                  <button onclick="app.drawDirections()">Show route</button>
                 </div>
                 `;
+              // <h5>@${event.name}</h5>
+              //   <p>${event.address}</p>
+              //   <h4>${timeString}<h4>
+              //   <button onclick="app.drawDirections()">Show route</button>
+
               var infowindow = new google.maps.InfoWindow({
                 content: contentString
               });
@@ -538,10 +537,30 @@ export default {
               });
 
               marker.addListener("click", () => {
-                infowindow.open(map, marker);
+                // infowindow.open(map, marker);
                 toggleBounce();
                 setTimeout(toggleBounce, 2000);
                 this.setDestination(event, marker);
+
+                var element = document.querySelector(`#card-${event.id}`);
+                element.scrollIntoView({ block: "end", behavior: "smooth" });
+
+                if (
+                  document.querySelector(`#card-${event.id} .card-reveal`).style
+                    .display !== "none"
+                ) {
+                  var elementClose = document.querySelector(
+                    `#card-${event.id} .card-reveal .material-icons.right`
+                  );
+                  elementClose.click();
+                } else {
+                  var elementOpen = document.querySelector(
+                    `#card-${event.id} .activator`
+                  );
+                  elementOpen.click();
+                }
+
+                this.currentEvent = event;
               });
             } else {
               alert(

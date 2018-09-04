@@ -1,7 +1,22 @@
 <template>
   <div class="profile">
+      <div class='container'>
       <h2>{{ user.name }}'s Events</h2>
-        <div class="row">
+        <div class="event list" v-for="event in events" v-if='event.user_event'>
+          <ul class="collection" >
+            <li class="collection-item avatar" >
+              <img v-for='artist in event.artists' v-bind:src="`${event.artists[0].primary_image}`" alt="" class='circle'>
+              <span class="title">{{getArtistsFromEvent(event)}} @ {{event.name}}</span>
+              <p>{{timeConvert(event.time)}}<br>
+                 {{event.address}} 
+              </p>
+              <button ><a v-bind:href="'/#/events/' + event.id">Event Info</a></button>
+              <a v-if="event.favorited" v-bind:class="{favorited: event.favorited}"v-on:click='removeFromFavorites(event)'class="secondary-content"><i class="material-icons">grade</i></a>
+            </li>
+          </ul>
+
+        </div>        
+        <!-- <div class="row">
               <div class="col s4" v-for="event in events" v-if='event.user_event'>
                 <div class="card">
                   <div class="card-image waves-effect waves-block waves-light">
@@ -25,9 +40,13 @@
                      </div>
                   </div>
                 </div>
-                </div>
+              </div>
               <a href="/#/">Back to all events</a>
-            </div>
+            </div> -->
+    <a href="/#/"><input type="submit" class='btn btn primary' value='Back To All Events'></a>
+    </div>
+
+  </div>
 </template>
 
 <script>

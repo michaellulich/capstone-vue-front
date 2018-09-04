@@ -48,13 +48,8 @@
 
 
 <!-- parallax picture -->
-<div class="parallax-container">
-      <div class="parallax"><img src="https://imgur.com/cwvA4Uj.jpg"></div>
-    </div>
 
-<div class="container">
     <router-view/>
-</div>
 
 <div class="parallax-container">
       <div class="parallax"><img src="https://imgur.com/cwvA4Uj.jpg"></div>
@@ -68,20 +63,13 @@
                 <h5 class="white-text">LoCALE</h5>
                 <p class="grey-text text-lighten-4">Bringing Artists and fans together.</p>
               </div>
-              <div class="col l4 offset-l2 s12">
-                <h5 class="white-text">Links</h5>
-                <ul>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                </ul>
-              </div>
-            </div>
           </div>
         <div class="footer-copyright">
       <div class="container">
         2018
-        <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
      </div>
     </div>
+  </div>
 </footer>
 </div>
 </template>
@@ -101,7 +89,13 @@ main {
 }
 
 .page-footer {
-  background-color: #4286f4;
+  background-color: #222a12;
+}
+.nav-wrapper {
+  background-color: #222a12;
+}
+.nav-wrapper-a {
+  color: red;
 }
 
 h1 {
