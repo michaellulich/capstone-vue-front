@@ -28,10 +28,10 @@
           <label>Password confirmation:</label>
           <input type="password" class="form-control" v-model="passwordConfirmation">
         </div>
-        <input type="submit" class="btn btn-primary" value="Submit">
+        <input type="submit" class="btn btn-primary btn-flat" value="Submit">
 
       </form>
-      <a href="/#/"><input type="submit" class='btn btn primary' value='Back To Events'></a>
+      <a href="/#/"><input type="submit" class='btn btn-flat' value='Back To Events'></a>
     </div>
   </div>
 </template>

@@ -43,6 +43,7 @@
 <ul id="dropdown2" class="dropdown-content">
       <li><a href="/#/loginartist">ARTIST</a></li>
       <li><a href="/#/login">USER</a></li>
+      <li><a href="https://accounts.spotify.com/authorize?client_id=d45c03352faf4be4884e657dc00ce33f&response_type=code&redirect_uri=http://localhost:8080/">Spotify</a></li>
 </ul>
 
 
@@ -60,14 +61,11 @@
           <div class="container">
             <div class="row">
               <div class="col l6 s12">
-                <h5 class="white-text">LoCALE</h5>
-                <p class="grey-text text-lighten-4">Bringing Artists and fans together.</p>
+                <h5 class="white-text" id="orange" >LoCALE</h5>
+                <p class="grey-text text-lighten-4" id="orange" >Bringing Artists and fans together.</p>
               </div>
           </div>
         <div class="footer-copyright">
-      <div class="container">
-        2018
-     </div>
     </div>
   </div>
 </footer>
@@ -90,20 +88,60 @@ main {
 
 .page-footer {
   background-color: #222a12;
+  font-family: "Baloo Tammudu";
 }
 .nav-wrapper {
   background-color: #222a12;
 }
-.nav-wrapper-a {
-  color: red;
+.nav-wrapper-li {
+  color: orange;
 }
 
 h1 {
   font-family: "Baloo Tammudu";
 }
+li {
+  font-family: "Indie Flower", cursive;
+}
 
 .brand-logo.right {
   font-family: "Baloo Tammudu";
+  color: orange;
+  padding-right: 35px !important;
+  padding-top: 10px !important;
+}
+
+.dropdown-trigger {
+  color: orange !important;
+}
+
+.material-icons {
+  color: orange !important;
+}
+
+.nav-wrapper a {
+  color: orange !important;
+}
+
+footer p {
+  color: orange !important;
+}
+
+#orange {
+  color: orange !important;
+}
+
+.btn:hover,
+.btn-large:hover,
+.btn-small:hover {
+  background-color: #64dd17;
+}
+
+.btn:hover,
+.btn-large:hover,
+.btn-small:hover
+.orange {
+  background-color: #64dd17;
 }
 </style>
 

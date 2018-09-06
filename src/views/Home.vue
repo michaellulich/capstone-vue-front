@@ -4,17 +4,46 @@
     <div class="container cards">
       
       <h1>ALL the Events</h1>
-      <button><a href="https://accounts.spotify.com/authorize?client_id=d45c03352faf4be4884e657dc00ce33f&response_type=code&redirect_uri=http://localhost:8080/">spotify</a></button>
-      <button ><a v-bind:href="'/#/profile'" >User Profile</a></button>
+    <!--   <button><a href="https://accounts.spotify.com/authorize?client_id=d45c03352faf4be4884e657dc00ce33f&response_type=code&redirect_uri=http://localhost:8080/">Magic Spotify Button</a></button> -->
+
+      <a class="waves-effect waves-orange btn-flat" v-bind:href="'/#/profile'" >User Profile</a> 
+      <button class="waves-effect waves-orange btn-flat" v-on:click='findMe()'>Where am I?</button> 
+      <button class="waves-effect waves-orange btn-flat" v-on:click="removeRoute()">Remove Route</button>
       <div class="row">
         <div class="col s4" v-bind:class="{'super-selected': event === currentEvent}" v-for="event in events">
-          <div class="card" v-bind:id="`card-${event.id}`">
+          <div class="card small sticky-action" v-bind:id="`card-${event.id}`">
             <div class="card-image waves-effect waves-block waves-light" >
               <img class="activator"  v-bind:src="`${event.artists[0].primary_image}`" height=220>
             </div>
               <div class="card-content">
                 <span class="card-title activator grey-text text-darken-4">{{getArtistsFromEvent(event)}}<i class="material-icons right">more_vert</i></span>
               </div>
+
+
+              <div class="card-action">
+                <a v-bind:href="'/#/events/' + event.id">Info</a>
+
+                <a href="javascript:void(0)" v-on:click='showRoute(event)'>Route</a>
+                
+                <a 
+                  v-if="!event.favorited"
+                  v-bind:class="{favorited: event.favorited}"
+                  v-on:click='addToFavorites(event)'
+                  href="javascript:void(0)"
+                >
+                  <i class="material-icons">favorite_border</i>
+                </a>
+                <a
+                  v-if="event.favorited"
+                  v-bind:class="{favorited: event.favorited}"
+                  v-on:click='removeFromFavorites(event)'
+                  href="javascript:void(0)"
+                >
+                  <i class="material-icons">favorite</i>
+                </a>
+              </div>
+
+
                 <div class="card-reveal">
                   <span class="card-title grey-text text-darken-4">{{getArtistsFromEvent(event)}}<i class="material-icons right">close</i>
                   </span>
@@ -25,17 +54,17 @@
                     </ul>
                       
                       <div v-for="artist in event.artists">
-                        <button data-target="modal" class="btn modal-trigger"  v-on:click="spotifyArtistSearch(artist.name)">{{ artist.name }}</button>
+                        <button data-target="modal" class="waves-effect waves-light btn-small modal-trigger btn-flat"  v-on:click="spotifyArtistSearch(artist.name)">{{ artist.name }}</button>
                       </div>
 
-                      <div v-on:click="favoriteButton(event)"> 
+                      <!-- <div v-on:click="favoriteButton(event)"> 
                         <button ><a v-bind:href="'/#/events/' + event.id">Event Info</a></button>
                         <button v-if="!event.favorited" v-bind:class="{favorited: event.favorited}" v-on:click='addToFavorites(event)'>I'd like to go.</button>
                         <button v-if="event.favorited" v-bind:class="{favorited: event.favorited}"v-on:click='removeFromFavorites(event)'>No thanks!</button>
-                      </div>
-                      <div v-on:click='showRoute(event)'>
+                      </div> -->
+                      <!-- <div v-on:click='showRoute(event)'>
                        <button >Show Route</button>
-                      </div>
+                      </div> -->
                 </div>
           </div>
         </div>        
@@ -80,6 +109,14 @@
   position: fixed;
 }
 
+.btn {
+  margin: 5px;
+}
+
+.btn-small {
+  margin: 2px;
+}
+
 .cards {
   overflow: scroll;
   height: 60vh;
@@ -108,6 +145,10 @@ h1 {
 .super-selected {
   color: #222a12 !important;
   border: 2px #222a12 solid;
+}
+
+i.material-icons {
+  color: orange !important;
 }
 </style>
 
@@ -175,18 +216,18 @@ export default {
           localStorage.setItem(
             "spotifyAccessToken",
             response.data.access_token
+            // this.$router.push("/");
+            // { headers: { "Authorization": `Bearer ${accessToken}`} };
+
+            // axios
+            //   .get("https://api.spotify.com/v1/me", {
+            //     headers: { Authorization: `Bearer ${accessToken}` }
+            //   })
+            //   .then(function(response) {
+            //     console.log("spotify me", response);
+            //   });
           );
           history.replaceState("data to be passed", "Title of the page", "/#/");
-          // this.$router.push("/");
-          // { headers: { "Authorization": `Bearer ${accessToken}`} };
-
-          // axios
-          //   .get("https://api.spotify.com/v1/me", {
-          //     headers: { Authorization: `Bearer ${accessToken}` }
-          //   })
-          //   .then(function(response) {
-          //     console.log("spotify me", response);
-          //   });
         });
     }
   },
@@ -201,10 +242,12 @@ export default {
       return moment(inputTime).format("MMM do YY");
     },
     addToFavorites: function(inputEvent) {
+      console.log("addToFavorites", inputEvent);
       axios
         .post("http://localhost:3000/user_events", { event_id: inputEvent.id })
         .then(response => {
           inputEvent.user_event = response.data;
+          inputEvent.favorited = !inputEvent.favorited;
         })
         .catch(error => {
           // this.errors = error.response.data.errors;
@@ -216,12 +259,14 @@ export default {
         .delete("http://localhost:3000/user_events/" + inputEvent.user_event.id)
         .then(response => {
           inputEvent.user_event = null;
+          inputEvent.favorited = !inputEvent.favorited;
           // var index = this.user_events.indexOf(inputEvent);
           // this.user_events.splice(index, 1);
         });
     },
     spotifyArtistSearch: function(inputArtist) {
       var accessToken = localStorage.getItem("spotifyAccessToken");
+
       var currentArtist = inputArtist;
       axios
         .get(
@@ -254,6 +299,38 @@ export default {
     showRoute: function(event, marker) {
       this.destination = event.address;
       this.drawDirections();
+    },
+    findMe: function() {
+      infoWindow = new google.maps.InfoWindow();
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            this.pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            infoWindow.setPosition(this.pos);
+            infoWindow.setContent("You Are Here.");
+            infoWindow.open(this.map);
+            this.map.setCenter(this.pos);
+          }.bind(this),
+          function() {
+            handleLocationError(true, infoWindow, this.map.getCenter());
+          }
+        );
+      } else {
+        // Browser doesn't support Geolocation
+        handleLocationError(false, infoWindow, this.map.getCenter());
+      }
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(
+          browserHasGeolocation
+            ? "Error: The Geolocation service failed."
+            : "Error: Your browser doesn't support geolocation."
+        );
+        infoWindow.open(map);
+      }
     },
     setUpVisualizer: function() {
       var start_button = document.getElementById("start"),
@@ -497,7 +574,7 @@ export default {
 
       var directionsService = new google.maps.DirectionsService();
       var directionsDisplay = new google.maps.DirectionsRenderer();
-      directionsDisplay.setMap(map);
+      // directionsDisplay.setMap(map);
 
       this.map = map;
       this.directionsService = directionsService;
@@ -621,6 +698,8 @@ export default {
       //   this.directionsDisplay
       // );
       // ROUTES
+
+      this.directionsDisplay.setMap(this.map);
       infoWindow = new google.maps.InfoWindow();
       this.directionsService.route(
         {
@@ -640,6 +719,9 @@ export default {
     setDestination: function(event, marker) {
       this.destination = event.address;
       // this.drawDirections();
+    },
+    removeRoute: function() {
+      this.directionsDisplay.setMap(null);
     }
   }
 };

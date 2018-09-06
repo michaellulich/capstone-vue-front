@@ -10,7 +10,7 @@
               <p>{{timeConvert(event.time)}}<br>
                  {{event.address}} 
               </p>
-              <button ><a v-bind:href="'/#/events/' + event.id">Event Info</a></button>
+              <button class="btn btn-flat"><a v-bind:href="'/#/events/' + event.id">Event Info</a></button>
               <a v-if="event.favorited" v-bind:class="{favorited: event.favorited}"v-on:click='removeFromFavorites(event)'class="secondary-content"><i class="material-icons">grade</i></a>
             </li>
           </ul>
@@ -43,11 +43,17 @@
               </div>
               <a href="/#/">Back to all events</a>
             </div> -->
-    <a href="/#/"><input type="submit" class='btn btn primary' value='Back To All Events'></a>
+    <a href="/#/"><input type="submit" class='btn btn-flat' value='Back To All Events'></a>
     </div>
 
   </div>
 </template>
+
+<style>
+h2 {
+  font-family: "Baloo Tammudu";
+}
+</style>
 
 <script>
 var moment = require("moment");

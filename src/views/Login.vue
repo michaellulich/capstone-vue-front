@@ -14,9 +14,9 @@
           <label>Password:</label>
           <input type="password" class="form-control" v-model="password">
         </div>
-        <input type="submit" class="btn btn-primary" value="Submit">
+        <input type="submit" class="btn btn-flat" value="Submit">
       </form>
-      <a href="/#/"><input type="submit" class='btn btn primary' value='Back To Events'></a>
+      <a href="/#/"><input type="submit" class='btn btn-flat' value='Back To Events'></a>
     </div>
   </div>
 </template>
@@ -28,8 +28,8 @@ export default {
   template: "#login-page",
   data: function() {
     return {
-      email: "",
-      password: "",
+      email: "mike@email.com",
+      password: "password",
       user: "",
       errors: []
     };

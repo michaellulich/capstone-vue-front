@@ -22,7 +22,7 @@
           <label>Time:</label>
           <input type="datetime-local" class="form-control" v-model="time">
         </div>
-        <input type="submit" class="btn btn-primary" value="Submit">
+        <input type="submit" class="btn btn-flat" value="Submit">
       </form>
     </div>
   </div>
